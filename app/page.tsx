@@ -1,6 +1,5 @@
-import { Button } from "@/components/ui/button"
+import { CustomButton } from "@/components/ui/custom-button"
 import { ArrowRight, Users, Building, UserPlus } from "lucide-react"
-import Link from "next/link"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
 
@@ -23,16 +22,14 @@ export default function Home() {
                   Compare preços e coberturas dos melhores planos de saúde do Brasil com a Contratandoplanos.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4">
-                  <Button
-                    asChild
+                  <CustomButton
+                    href="/cotacao"
                     size="lg"
                     className="bg-amber-500 text-white hover:bg-amber-600 rounded-full font-bold shadow-lg transform hover:scale-105 transition-all"
                   >
-                    <Link href="/cotacao">
-                      Faça sua cotação agora
-                      <ArrowRight className="ml-2 h-5 w-5" />
-                    </Link>
-                  </Button>
+                    Faça sua cotação agora
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </CustomButton>
                 </div>
               </div>
               <div className="hidden md:block relative">
@@ -228,20 +225,20 @@ export default function Home() {
                 Faça uma cotação gratuita e descubra as melhores opções de planos de saúde para você.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button
-                  asChild
+                <CustomButton
+                  href="/cotacao"
                   size="lg"
                   className="bg-amber-500 text-white hover:bg-amber-600 rounded-full font-bold shadow-lg transform hover:scale-105 transition-all"
                 >
-                  <Link href="/cotacao">Fazer cotação gratuita</Link>
-                </Button>
-                <Button
-                  asChild
+                  Fazer cotação gratuita
+                </CustomButton>
+                <CustomButton
+                  href="/contato"
                   size="lg"
                   className="bg-white text-[#168979] hover:bg-white/90 rounded-full font-medium"
                 >
-                  <Link href="/contato">Falar com um consultor</Link>
-                </Button>
+                  Falar com um consultor
+                </CustomButton>
               </div>
             </div>
           </div>
