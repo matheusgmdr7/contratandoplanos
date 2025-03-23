@@ -22,22 +22,34 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
+  // Fechar o menu quando a tela for redimensionada para desktop
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setIsMenuOpen(false)
+      }
+    }
+
+    window.addEventListener("resize", handleResize)
+    return () => window.removeEventListener("resize", handleResize)
+  }, [])
+
   return (
     <header className={`sticky top-0 z-50 transition-all duration-300 ${scrolled ? "shadow-md" : ""}`}>
       <div className="bg-[#168979] text-white">
         <div className="container mx-auto px-4 md:px-6 py-3">
           <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center">
+            <Link href="/" className="flex items-center z-20 relative">
               <img
                 src="https://i.ibb.co/pjVQg3Xh/A-PR-ESTA-DE-CARA-NOVA-1.png"
                 alt="Contratandoplanos"
-                className="h-10 w-auto"
-                style={{ maxWidth: "180px" }}
+                className="h-8 md:h-10 w-auto"
+                style={{ maxWidth: "160px" }}
               />
             </Link>
 
             {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center space-x-8">
+            <nav className="hidden md:flex items-center space-x-4 lg:space-x-8">
               <Link
                 href="/"
                 className="text-white hover:text-white/80 font-medium text-sm tracking-wide transition-colors relative after:absolute after:bottom-[-4px] after:left-0 after:h-[2px] after:w-0 after:bg-white after:transition-all hover:after:w-full"
@@ -65,7 +77,7 @@ export default function Header() {
               <CustomButton
                 href="/cotacao"
                 size="sm"
-                className="bg-white text-[#168979] hover:bg-white/90 font-medium rounded-full px-6"
+                className="bg-white text-[#168979] hover:bg-white/90 font-medium rounded-full px-4 lg:px-6"
               >
                 Fazer cotação
               </CustomButton>
@@ -73,7 +85,7 @@ export default function Header() {
 
             {/* Mobile Menu Button */}
             <button
-              className="md:hidden text-white"
+              className="md:hidden text-white z-20 relative"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               aria-label={isMenuOpen ? "Fechar menu" : "Abrir menu"}
             >
@@ -83,39 +95,39 @@ export default function Header() {
 
           {/* Mobile Navigation */}
           {isMenuOpen && (
-            <nav className="md:hidden pt-4 pb-4 border-t border-white/20 mt-3">
+            <nav className="md:hidden fixed inset-0 bg-[#168979] z-10 pt-20 px-4">
               <div className="flex flex-col space-y-4">
                 <Link
                   href="/"
-                  className="text-white font-medium py-2 hover:translate-x-1 transition-transform"
+                  className="text-white font-medium py-2 hover:translate-x-1 transition-transform text-lg"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Início
                 </Link>
                 <Link
                   href="/sobre"
-                  className="text-white font-medium py-2 hover:translate-x-1 transition-transform"
+                  className="text-white font-medium py-2 hover:translate-x-1 transition-transform text-lg"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Sobre nós
                 </Link>
                 <Link
                   href="/contato"
-                  className="text-white font-medium py-2 hover:translate-x-1 transition-transform"
+                  className="text-white font-medium py-2 hover:translate-x-1 transition-transform text-lg"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Contato
                 </Link>
                 <Link
                   href="/corretores"
-                  className="text-white font-medium py-2 hover:translate-x-1 transition-transform"
+                  className="text-white font-medium py-2 hover:translate-x-1 transition-transform text-lg"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Corretores
                 </Link>
                 <CustomButton
                   href="/cotacao"
-                  className="bg-white text-[#168979] hover:bg-white/90 w-full mt-2 rounded-full"
+                  className="bg-white text-[#168979] hover:bg-white/90 w-full mt-2 rounded-full py-3 text-lg"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Fazer cotação
