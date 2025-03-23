@@ -41,7 +41,7 @@ export default function Header() {
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center z-20 relative">
               <img
-                src="https://i.ibb.co/pjVQg3Xh/A-PR-ESTA-DE-CARA-NOVA-1.png"
+                src="https://i.ibb.co/cpvGGHM/logo.png"
                 alt="Contratandoplanos"
                 className="h-8 md:h-10 w-auto"
                 style={{ maxWidth: "160px" }}
