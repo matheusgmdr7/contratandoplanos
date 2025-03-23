@@ -32,7 +32,7 @@ export default function Home() {
                   </CustomButton>
                 </div>
               </div>
-              <div className="hidden md:block relative">
+              <div className="block relative mt-8 md:mt-0">
                 <div className="absolute -inset-0.5 bg-white/20 rounded-2xl blur-xl"></div>
                 <img
                   src="https://i.ibb.co/vvLp7GFD/Inserir-um-ti-tulo-3.png"
@@ -109,7 +109,7 @@ export default function Home() {
               <div className="bg-gray-50 rounded-xl shadow-sm hover:shadow-md transition-shadow w-full h-16 md:h-24 overflow-hidden">
                 <div className="w-full h-full flex items-center justify-center">
                   <img
-                    src="https://i.ibb.co/jP3Nwx1K/Uni-Nacional.png"
+                    src="https://i.ibb.co/fzhQW0FM/Unimed2.png"
                     alt="Operadora 1"
                     className="w-full h-full object-cover"
                     style={{ objectPosition: "center" }}
@@ -130,7 +130,7 @@ export default function Home() {
               <div className="bg-gray-50 rounded-xl shadow-sm hover:shadow-md transition-shadow w-full h-16 md:h-24 overflow-hidden">
                 <div className="w-full h-full">
                   <img
-                    src="https://i.ibb.co/ksPMTgyN/UniSeg.png"
+                    src="https://i.ibb.co/Hf35SSwv/Seguros-Unimed.png"
                     alt="Seguros Unimed"
                     className="w-full h-full object-cover"
                   />
