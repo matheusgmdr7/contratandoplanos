@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
+import { CustomButton } from "@/components/ui/custom-button"
 import { Menu, X } from "lucide-react"
 
 export default function Header() {
@@ -62,13 +62,13 @@ export default function Header() {
               >
                 Corretores
               </Link>
-              <Button
-                asChild
+              <CustomButton
+                href="/cotacao"
                 size="sm"
                 className="bg-white text-[#168979] hover:bg-white/90 font-medium rounded-full px-6"
               >
-                <Link href="/cotacao">Fazer cotação</Link>
-              </Button>
+                Fazer cotação
+              </CustomButton>
             </nav>
 
             {/* Mobile Menu Button */}
@@ -113,13 +113,13 @@ export default function Header() {
                 >
                   Corretores
                 </Link>
-                <Button
-                  asChild
+                <CustomButton
+                  href="/cotacao"
                   className="bg-white text-[#168979] hover:bg-white/90 w-full mt-2 rounded-full"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  <Link href="/cotacao">Fazer cotação</Link>
-                </Button>
+                  Fazer cotação
+                </CustomButton>
               </div>
             </nav>
           )}
