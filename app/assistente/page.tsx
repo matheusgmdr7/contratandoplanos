@@ -212,7 +212,7 @@ export default function AssistentePage() {
                       className="w-full md:w-auto bg-white text-[#168979] hover:bg-gray-100 text-sm md:text-base"
                     >
                       <Link
-                        href={`https://wa.me/5521969564416?text=Olá! Meu nome é ${dadosCliente.nome} e tenho interesse no plano ${dadosCliente.planoSelecionado.nome} da ${dadosCliente.planoSelecionado.operadora}.`}
+                        href={`https://wa.me/551151941621?text=Olá! Meu nome é ${dadosCliente.nome} e tenho interesse no plano ${dadosCliente.planoSelecionado.nome} da ${dadosCliente.planoSelecionado.operadora}.`}
                         target="_blank"
                       >
                         Falar com corretor
