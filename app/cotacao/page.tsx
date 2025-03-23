@@ -125,7 +125,7 @@ export default function CotacaoPage() {
             <div className="space-y-4 md:space-y-6">
               <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
                 <h2 className="text-xl md:text-2xl font-bold text-[#168979]">Planos encontrados</h2>
-                <Button variant="outline" className="w-full sm:w-auto">
+                <Button variant="outline" className="w-full sm:w-auto" onClick={() => setMostrarResultados(false)}>
                   Voltar à pesquisa
                 </Button>
               </div>
@@ -169,7 +169,7 @@ export default function CotacaoPage() {
                   <p className="text-base md:text-lg text-gray-600 mb-4">
                     Não encontramos planos que correspondam aos seus critérios.
                   </p>
-                  <Button variant="outline" className="w-full sm:w-auto">
+                  <Button variant="outline" className="w-full sm:w-auto" onClick={() => setMostrarResultados(false)}>
                     Tentar novamente
                   </Button>
                 </div>
