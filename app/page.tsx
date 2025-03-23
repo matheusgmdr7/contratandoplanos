@@ -109,7 +109,7 @@ export default function Home() {
               <div className="bg-gray-50 rounded-xl shadow-sm hover:shadow-md transition-shadow w-full h-16 md:h-24 overflow-hidden">
                 <div className="w-full h-full flex items-center justify-center">
                   <img
-                    src="https://i.ibb.co/fzhQW0FM/Unimed2.png"
+                    src="https://i.ibb.co/SD3331CP/Uni-Nacional.png"
                     alt="Operadora 1"
                     className="w-full h-full object-cover"
                     style={{ objectPosition: "center" }}
@@ -130,7 +130,7 @@ export default function Home() {
               <div className="bg-gray-50 rounded-xl shadow-sm hover:shadow-md transition-shadow w-full h-16 md:h-24 overflow-hidden">
                 <div className="w-full h-full">
                   <img
-                    src="https://i.ibb.co/Hf35SSwv/Seguros-Unimed.png"
+                    src="https://i.ibb.co/S7Jc0kQz/UniSeg.png"
                     alt="Seguros Unimed"
                     className="w-full h-full object-cover"
                   />
