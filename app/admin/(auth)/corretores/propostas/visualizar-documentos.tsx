@@ -1,200 +1,175 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import type { PropostaCorretor } from "@/types/corretores"
-import { FileIcon, FileTextIcon } from "lucide-react"
-import Image from "next/image"
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
+import { Skeleton } from "@/components/ui/skeleton"
+import { Eye, Download, FileText } from "lucide-react"
+import { obterUrlDocumento } from "@/services/storage-service"
 
-export function VisualizarDocumentos({ proposta }: { proposta: PropostaCorretor }) {
-  const [open, setOpen] = useState(false)
-  const [documentos, setDocumentos] = useState<{
-    rgFrente?: string
-    rgVerso?: string
-    comprovante?: string
-  }>({})
-  const [loading, setLoading] = useState(false)
-  const [erro, setErro] = useState<string | null>(null)
-
-  const carregarDocumentos = async () => {
-    if (loading) return
-
-    setLoading(true)
-    setErro(null)
-
-    try {
-      const supabase = createClientComponentClient()
-
-      // Verificar se os caminhos dos documentos existem
-      const caminhos = [
-        proposta.documento_rg_frente,
-        proposta.documento_rg_verso,
-        proposta.documento_comprovante_residencia,
-      ].filter(Boolean) as string[]
-
-      if (caminhos.length === 0) {
-        setErro("Nenhum documento encontrado para esta proposta.")
-        setLoading(false)
-        return
-      }
-
-      // Obter URLs públicas para cada documento
-      const urls: Record<string, string> = {}
-
-      for (const caminho of caminhos) {
-        try {
-          // Extrair o bucket e o caminho do arquivo
-          const [bucket, ...pathParts] = caminho.split("/").filter(Boolean)
-          const path = pathParts.join("/")
-
-          const { data, error } = await supabase.storage.from(bucket).createSignedUrl(path, 3600) // URL válida por 1 hora
-
-          if (error) {
-            console.error(`Erro ao obter URL para ${caminho}:`, error)
-            continue
-          }
-
-          if (caminho === proposta.documento_rg_frente) {
-            urls.rgFrente = data.signedUrl
-          } else if (caminho === proposta.documento_rg_verso) {
-            urls.rgVerso = data.signedUrl
-          } else if (caminho === proposta.documento_comprovante_residencia) {
-            urls.comprovante = data.signedUrl
-          }
-        } catch (error) {
-          console.error(`Erro ao processar ${caminho}:`, error)
-        }
-      }
-
-      setDocumentos(urls)
-
-      if (Object.keys(urls).length === 0) {
-        setErro("Não foi possível carregar os documentos. Verifique os caminhos dos arquivos.")
-      }
-    } catch (error) {
-      console.error("Erro ao carregar documentos:", error)
-      setErro("Ocorreu um erro ao carregar os documentos.")
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleOpen = (isOpen: boolean) => {
-    setOpen(isOpen)
-    if (isOpen) {
-      carregarDocumentos()
-    }
-  }
-
-  const temDocumentos =
-    proposta.documento_rg_frente || proposta.documento_rg_verso || proposta.documento_comprovante_residencia
-
-  return (
-    <Dialog open={open} onOpenChange={handleOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline" size="sm" disabled={!temDocumentos}>
-          <FileIcon className="h-4 w-4 mr-2" />
-          {temDocumentos ? "Ver Documentos" : "Sem Documentos"}
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="max-w-4xl">
-        <DialogHeader>
-          <DialogTitle>Documentos da Proposta</DialogTitle>
-          <DialogDescription>
-            Documentos enviados pelo corretor para a proposta de {proposta.nome_cliente}
-          </DialogDescription>
-        </DialogHeader>
-
-        {loading ? (
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-          </div>
-        ) : erro ? (
-          <div className="text-center text-red-500 p-4">{erro}</div>
-        ) : (
-          <Tabs defaultValue="rgFrente">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="rgFrente" disabled={!documentos.rgFrente}>
-                RG/CNH (Frente)
-              </TabsTrigger>
-              <TabsTrigger value="rgVerso" disabled={!documentos.rgVerso}>
-                RG/CNH (Verso)
-              </TabsTrigger>
-              <TabsTrigger value="comprovante" disabled={!documentos.comprovante}>
-                Comprovante de Residência
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="rgFrente" className="mt-4">
-              {documentos.rgFrente ? (
-                <DocumentoPreview url={documentos.rgFrente} titulo="RG/CNH (Frente)" />
-              ) : (
-                <div className="text-center p-8 border rounded-md">Documento não disponível</div>
-              )}
-            </TabsContent>
-
-            <TabsContent value="rgVerso" className="mt-4">
-              {documentos.rgVerso ? (
-                <DocumentoPreview url={documentos.rgVerso} titulo="RG/CNH (Verso)" />
-              ) : (
-                <div className="text-center p-8 border rounded-md">Documento não disponível</div>
-              )}
-            </TabsContent>
-
-            <TabsContent value="comprovante" className="mt-4">
-              {documentos.comprovante ? (
-                <DocumentoPreview url={documentos.comprovante} titulo="Comprovante de Residência" />
-              ) : (
-                <div className="text-center p-8 border rounded-md">Documento não disponível</div>
-              )}
-            </TabsContent>
-          </Tabs>
-        )}
-      </DialogContent>
-    </Dialog>
-  )
+interface VisualizadorDocumentosProps {
+  propostaId: string
+  documentos: Array<{
+    id: string
+    nome: string
+    tipo: string
+    url?: string
+  }>
 }
 
-function DocumentoPreview({ url, titulo }: { url: string; titulo: string }) {
-  const extensao = url.split(".").pop()?.toLowerCase() || ""
-  const isPDF = extensao === "pdf"
-  const isImage = ["jpg", "jpeg", "png", "gif", "webp"].includes(extensao)
+export default function VisualizadorDocumentos({ propostaId, documentos }: VisualizadorDocumentosProps) {
+  const [docsComUrl, setDocsComUrl] = useState<Array<{ id: string; nome: string; tipo: string; url: string }>>([])
+  const [carregando, setCarregando] = useState(true)
+  const [documentoAtivo, setDocumentoAtivo] = useState<string | null>(null)
+
+  useEffect(() => {
+    const carregarUrls = async () => {
+      try {
+        setCarregando(true)
+
+        // Para cada documento, obter a URL pública
+        const docsProcessados = await Promise.all(
+          documentos.map(async (doc) => {
+            try {
+              // Se já tiver URL, usar a existente
+              if (doc.url) return { ...doc, url: doc.url }
+
+              // Caso contrário, obter do storage
+              const url = await obterUrlDocumento(propostaId, doc.nome)
+              return { ...doc, url }
+            } catch (error) {
+              console.error(`Erro ao obter URL para documento ${doc.nome}:`, error)
+              return { ...doc, url: "" }
+            }
+          }),
+        )
+
+        setDocsComUrl(docsProcessados.filter((doc) => doc.url) as any)
+
+        // Definir o primeiro documento como ativo, se houver
+        if (docsProcessados.length > 0 && docsProcessados[0].url) {
+          setDocumentoAtivo(docsProcessados[0].id)
+        }
+      } catch (error) {
+        console.error("Erro ao carregar URLs dos documentos:", error)
+      } finally {
+        setCarregando(false)
+      }
+    }
+
+    if (documentos && documentos.length > 0) {
+      carregarUrls()
+    } else {
+      setCarregando(false)
+    }
+  }, [documentos, propostaId])
+
+  // Função para obter o documento ativo
+  const getDocumentoAtivo = () => {
+    return docsComUrl.find((doc) => doc.id === documentoAtivo)
+  }
+
+  // Função para baixar o documento
+  const baixarDocumento = (url: string, nome: string) => {
+    const link = document.createElement("a")
+    link.href = url
+    link.download = nome
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
 
   return (
-    <div className="flex flex-col items-center">
-      <h3 className="text-lg font-medium mb-2">{titulo}</h3>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* Lista de documentos */}
+      <div className="md:col-span-1">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Documentos</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {carregando ? (
+              <div className="space-y-2">
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+              </div>
+            ) : docsComUrl.length > 0 ? (
+              <div className="space-y-2">
+                {docsComUrl.map((doc) => (
+                  <Button
+                    key={doc.id}
+                    variant={documentoAtivo === doc.id ? "default" : "outline"}
+                    className="w-full justify-start text-left"
+                    onClick={() => setDocumentoAtivo(doc.id)}
+                  >
+                    <FileText className="mr-2 h-4 w-4" />
+                    <span className="truncate">{doc.nome}</span>
+                  </Button>
+                ))}
+              </div>
+            ) : (
+              <p className="text-center text-muted-foreground py-4">Nenhum documento disponível</p>
+            )}
+          </CardContent>
+        </Card>
+      </div>
 
-      {isPDF ? (
-        <div className="w-full h-[500px] border rounded-md overflow-hidden">
-          <iframe src={`${url}#toolbar=0`} className="w-full h-full" title={titulo} />
-        </div>
-      ) : isImage ? (
-        <div className="relative w-full h-[500px] border rounded-md overflow-hidden">
-          <Image src={url || "/placeholder.svg"} alt={titulo} fill className="object-contain" />
-        </div>
-      ) : (
-        <div className="flex flex-col items-center justify-center p-8 border rounded-md w-full">
-          <FileTextIcon className="h-16 w-16 text-muted-foreground mb-4" />
-          <p>Tipo de arquivo não suportado para visualização</p>
-          <Button variant="outline" className="mt-4" onClick={() => window.open(url, "_blank")}>
-            Baixar Arquivo
-          </Button>
-        </div>
-      )}
-
-      <Button variant="outline" className="mt-4" onClick={() => window.open(url, "_blank")}>
-        Abrir em Nova Aba
-      </Button>
+      {/* Visualizador de documento */}
+      <div className="md:col-span-2">
+        <Card className="h-full flex flex-col">
+          <CardHeader className="flex-row flex items-center justify-between">
+            <CardTitle className="text-lg">{getDocumentoAtivo()?.nome || "Visualizador de Documento"}</CardTitle>
+            {getDocumentoAtivo() && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => baixarDocumento(getDocumentoAtivo()!.url, getDocumentoAtivo()!.nome)}
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Baixar
+              </Button>
+            )}
+          </CardHeader>
+          <CardContent className="flex-1 flex items-center justify-center">
+            {carregando ? (
+              <div className="w-full h-[400px] flex items-center justify-center">
+                <Skeleton className="h-full w-full" />
+              </div>
+            ) : getDocumentoAtivo() ? (
+              <div className="w-full h-[400px] overflow-hidden flex items-center justify-center">
+                {getDocumentoAtivo()?.tipo?.includes("image") ? (
+                  <img
+                    src={getDocumentoAtivo()?.url || "/placeholder.svg"}
+                    alt={getDocumentoAtivo()?.nome}
+                    className="max-w-full max-h-full object-contain"
+                  />
+                ) : getDocumentoAtivo()?.tipo?.includes("pdf") ? (
+                  <iframe src={getDocumentoAtivo()?.url} className="w-full h-full" title={getDocumentoAtivo()?.nome} />
+                ) : (
+                  <div className="text-center">
+                    <FileText className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
+                    <p>Este tipo de arquivo não pode ser visualizado diretamente.</p>
+                    <Button
+                      variant="outline"
+                      className="mt-4"
+                      onClick={() => baixarDocumento(getDocumentoAtivo()!.url, getDocumentoAtivo()!.nome)}
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      Baixar Arquivo
+                    </Button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <Eye className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                <p>Selecione um documento para visualizar</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }
