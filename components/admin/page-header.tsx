@@ -3,21 +3,21 @@ import type React from "react"
 interface PageHeaderProps {
   title: string
   description?: string
-  action?: React.ReactNode
   actions?: React.ReactNode
 }
 
-export function PageHeader({ title, description, action, actions }: PageHeaderProps) {
+export function PageHeader({ title, description, actions }: PageHeaderProps) {
   return (
-    <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+    <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
       <div>
         <h1 className="text-2xl font-bold text-gray-800">{title}</h1>
-        {description && <p className="text-gray-500 mt-1">{description}</p>}
+        {description && <p className="mt-1 text-gray-500">{description}</p>}
       </div>
-      {(action || actions) && <div className="mt-4 md:mt-0">{action || actions}</div>}
+      {actions && <div className="flex items-center gap-2">{actions}</div>}
     </div>
   )
 }
 
+// Também exportamos como padrão para compatibilidade com imports existentes
 export default PageHeader
 
