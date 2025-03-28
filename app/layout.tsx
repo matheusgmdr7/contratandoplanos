@@ -5,7 +5,6 @@ import "./globals.css"
 export const metadata: Metadata = {
   title: "Contratando Planos",
   description: "Encontre o plano de saúde ideal para você e sua família",
-    generator: 'v0.dev'
 }
 
 export default function RootLayout({
@@ -20,6 +19,3 @@ export default function RootLayout({
   )
 }
 
-
-
-import './globals.css'
