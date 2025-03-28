@@ -13,4 +13,3 @@ export interface Plano {
 }
 
 export type FaixaEtaria = "0-18" | "19-23" | "24-28" | "29-33" | "34-38" | "39-43" | "44-48" | "49-53" | "54-58" | "59+"
-
