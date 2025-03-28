@@ -14,4 +14,3 @@ export function Spinner({ className, ...props }: SpinnerProps) {
     </div>
   )
 }
-
