@@ -26,4 +26,3 @@ const Eye = React.forwardRef<SVGSVGElement, EyeProps>((props, ref) => {
 Eye.displayName = "Eye"
 
 export { Eye }
-
