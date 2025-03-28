@@ -2,402 +2,348 @@
 
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, Download, Eye, Mail, Phone } from "lucide-react"
+import { Textarea } from "@/components/ui/textarea"
+import { Plus, Pencil, Trash2 } from "lucide-react"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { buscarLeads, atualizarLead } from "@/services/leads-service"
-import type { Lead } from "@/services/leads-service"
-import * as XLSX from "xlsx"
+import { buscarPlanos, criarPlano, atualizarPlano, deletarPlano } from "@/services/planos-service"
+import type { Plano, FaixaEtaria } from "@/types/planos"
 
-export default function LeadsPage() {
-  const [leads, setLeads] = useState<Lead[]>([])
-  const [searchTerm, setSearchTerm] = useState("")
-  const [filtroStatus, setFiltroStatus] = useState("Todos")
-  const [filtroData, setFiltroData] = useState("Todos")
-  const [filtroEstado, setFiltroEstado] = useState("Todos")
-  const [filtroFaixaEtaria, setFiltroFaixaEtaria] = useState("Todos")
-  const [filtroOperadora, setFiltroOperadora] = useState("Todos")
-  const [leadSelecionado, setLeadSelecionado] = useState<Lead | null>(null)
+const FAIXAS_ETARIAS: FaixaEtaria[] = [
+  "0-18",
+  "19-23",
+  "24-28",
+  "29-33",
+  "34-38",
+  "39-43",
+  "44-48",
+  "49-53",
+  "54-58",
+  "59+",
+]
+
+export default function PlanosAdminPage() {
+  const [planos, setPlanos] = useState<Plano[]>([])
+  const [planoAtual, setPlanoAtual] = useState<Partial<Plano>>({
+    id: 0,
+    nome: "",
+    operadora: "",
+    cobertura: "",
+    tipo: "",
+    descricao: "",
+  })
+  const [precos, setPrecos] = useState<{ faixa_etaria: FaixaEtaria; preco: number }[]>(
+    FAIXAS_ETARIAS.map((faixa) => ({ faixa_etaria: faixa, preco: 0 })),
+  )
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
+  const [searchTerm, setSearchTerm] = useState("")
+  const [filtroTipo, setFiltroTipo] = useState("Todos")
   const [carregando, setCarregando] = useState(true)
   const [erro, setErro] = useState<string | null>(null)
 
   useEffect(() => {
-    carregarLeads()
+    carregarPlanos()
   }, [])
 
-  async function carregarLeads() {
+  async function carregarPlanos() {
+    setCarregando(true)
+    setErro(null)
+
     try {
-      const dados = await buscarLeads()
-      setLeads(dados)
+      const resultados = await buscarPlanos()
+      setPlanos(resultados)
     } catch (error) {
-      console.error("Erro ao carregar leads:", error)
-      setErro("Falha ao carregar os leads. Por favor, tente novamente.")
+      console.error("Erro ao carregar planos:", error)
+      setErro("Falha ao carregar os planos. Por favor, tente novamente.")
     } finally {
       setCarregando(false)
     }
   }
 
-  const handleViewLead = (lead: Lead) => {
-    setLeadSelecionado(lead)
+  const handleAddPlano = () => {
+    setIsEditing(false)
+    setPlanoAtual({
+      nome: "",
+      operadora: "",
+      cobertura: "",
+      tipo: "",
+      descricao: "",
+    })
+    setPrecos(FAIXAS_ETARIAS.map((faixa) => ({ faixa_etaria: faixa, preco: 0 })))
     setIsDialogOpen(true)
   }
 
-  const handleStatusChange = async (leadId: number, novoStatus: string) => {
-    try {
-      await atualizarLead(leadId.toString(), { status: novoStatus })
-      await carregarLeads()
-    } catch (error) {
-      console.error("Erro ao atualizar status:", error)
-      setErro("Falha ao atualizar o status. Por favor, tente novamente.")
-    }
+  const handleEditPlano = (plano: Plano) => {
+    setIsEditing(true)
+    setPlanoAtual(plano)
+    // Aqui você precisaria carregar os preços do plano
+    setIsDialogOpen(true)
   }
 
-  const leadsFiltrados = leads.filter((lead) => {
-    const matchesSearch =
-      lead.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      lead.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      lead.whatsapp.includes(searchTerm)
-    const matchesStatus = filtroStatus === "Todos" || lead.status === filtroStatus
-    const matchesEstado = filtroEstado === "Todos" || lead.estado === filtroEstado
-    const matchesFaixaEtaria = filtroFaixaEtaria === "Todos" || lead.faixa_etaria === filtroFaixaEtaria
-    const matchesOperadora = filtroOperadora === "Todos" || lead.plano_operadora === filtroOperadora
-
-    // Filtro de data
-    let matchesData = true
-    if (filtroData !== "Todos") {
-      const hoje = new Date()
-      const dataLead = new Date(lead.data_registro)
-      const diffTime = Math.abs(hoje.getTime() - dataLead.getTime())
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-
-      switch (filtroData) {
-        case "Hoje":
-          matchesData = diffDays === 0
-          break
-        case "Esta semana":
-          matchesData = diffDays <= 7
-          break
-        case "Este mês":
-          matchesData = diffDays <= 30
-          break
-        case "Este ano":
-          matchesData = diffDays <= 365
-          break
+  const handleDeletePlano = async (id: number) => {
+    if (window.confirm("Tem certeza que deseja excluir este plano?")) {
+      try {
+        await deletarPlano(id.toString())
+        setPlanos(planos.filter((plano) => plano.id !== id))
+      } catch (error) {
+        console.error("Erro ao excluir plano:", error)
+        alert("Erro ao excluir plano. Por favor, tente novamente.")
       }
     }
-
-    return matchesSearch && matchesStatus && matchesEstado && matchesFaixaEtaria && matchesOperadora && matchesData
-  })
-
-  // Extrair valores únicos para os filtros
-  const estados = Array.from(new Set(leads.map((lead) => lead.estado)))
-  const faixasEtarias = Array.from(new Set(leads.map((lead) => lead.faixa_etaria)))
-  const operadoras = Array.from(new Set(leads.map((lead) => lead.plano_operadora)))
-
-  const exportarParaExcel = () => {
-    // Preparar dados para exportação
-    const dadosParaExportar = leads.map((lead) => ({
-      Nome: lead.nome,
-      Email: lead.email,
-      WhatsApp: lead.whatsapp,
-      Plano: lead.plano_nome,
-      Operadora: lead.plano_operadora,
-      "Faixa Etária": lead.faixa_etaria,
-      Estado: lead.estado,
-      "Data de Registro": new Date(lead.data_registro).toLocaleDateString(),
-      Status: lead.status,
-      Observações: lead.observacoes || "",
-    }))
-
-    // Criar planilha
-    const ws = XLSX.utils.json_to_sheet(dadosParaExportar)
-    const wb = XLSX.utils.book_new()
-    XLSX.utils.book_append_sheet(wb, ws, "Leads")
-
-    // Gerar arquivo
-    XLSX.writeFile(wb, "leads.xlsx")
   }
 
+  const handleSavePlano = async () => {
+    try {
+      setCarregando(true)
+      setErro(null)
+
+      // Validar campos obrigatórios
+      if (!planoAtual.nome || !planoAtual.operadora || !planoAtual.cobertura || !planoAtual.tipo) {
+        setErro("Por favor, preencha todos os campos obrigatórios.")
+        return
+      }
+
+      // Validar preços
+      if (precos.some((preco) => preco.preco <= 0)) {
+        setErro("Por favor, preencha todos os preços com valores maiores que zero.")
+        return
+      }
+
+      const planoComPrecos = {
+        ...planoAtual,
+        precos,
+      }
+
+      if (isEditing && planoAtual.id) {
+        await atualizarPlano(planoAtual.id.toString(), planoComPrecos)
+      } else {
+        await criarPlano(planoComPrecos as Omit<Plano, "id">)
+      }
+
+      await carregarPlanos()
+      setIsDialogOpen(false)
+    } catch (error) {
+      console.error("Erro ao salvar plano:", error)
+      setErro(error instanceof Error ? error.message : "Erro ao salvar plano. Por favor, tente novamente.")
+    } finally {
+      setCarregando(false)
+    }
+  }
+
+  const planosFiltrados = planos.filter((plano) => {
+    const matchSearch =
+      plano.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      plano.operadora.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchTipo = filtroTipo === "Todos" || plano.tipo === filtroTipo
+    return matchSearch && matchTipo
+  })
+
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold text-gray-800">Gerenciamento de Leads</h1>
-        <div className="flex gap-4">
-          <Button onClick={exportarParaExcel} className="flex items-center gap-2">
-            <Download className="h-4 w-4" />
-            Exportar Excel
-          </Button>
-        </div>
+    <div className="container mx-auto py-10">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Gerenciar Planos</h1>
+        <Button onClick={handleAddPlano}>
+          <Plus className="mr-2 h-4 w-4" />
+          Novo Plano
+        </Button>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Leads</CardTitle>
-          <CardDescription>Visualize e gerencie todos os leads cadastrados</CardDescription>
+          <CardTitle>Lista de Planos</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col md:flex-row gap-4 mb-6">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
-              <Input
-                placeholder="Buscar por nome, email ou telefone..."
-                className="pl-9"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-              <Select value={filtroStatus} onValueChange={setFiltroStatus}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Todos">Todos os status</SelectItem>
-                  <SelectItem value="Novo">Novo</SelectItem>
-                  <SelectItem value="Em contato">Em contato</SelectItem>
-                  <SelectItem value="Convertido">Convertido</SelectItem>
-                  <SelectItem value="Perdido">Perdido</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Select value={filtroData} onValueChange={setFiltroData}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Período" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Todos">Todos os períodos</SelectItem>
-                  <SelectItem value="Hoje">Hoje</SelectItem>
-                  <SelectItem value="Esta semana">Esta semana</SelectItem>
-                  <SelectItem value="Este mês">Este mês</SelectItem>
-                  <SelectItem value="Este ano">Este ano</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Select value={filtroEstado} onValueChange={setFiltroEstado}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Estado" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Todos">Todos os estados</SelectItem>
-                  {estados.map((estado) => (
-                    <SelectItem key={estado} value={estado}>
-                      {estado}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Select value={filtroFaixaEtaria} onValueChange={setFiltroFaixaEtaria}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Faixa Etária" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Todos">Todas as faixas</SelectItem>
-                  {faixasEtarias.map((faixa) => (
-                    <SelectItem key={faixa} value={faixa}>
-                      {faixa}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Select value={filtroOperadora} onValueChange={setFiltroOperadora}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Operadora" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Todos">Todas as operadoras</SelectItem>
-                  {operadoras.map((operadora) => (
-                    <SelectItem key={operadora} value={operadora}>
-                      {operadora}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="flex gap-4 mb-4">
+            <Input placeholder="Buscar planos..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+            <Select value={filtroTipo} onValueChange={setFiltroTipo}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Filtrar por tipo" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Todos">Todos</SelectItem>
+                <SelectItem value="Individual">Individual</SelectItem>
+                <SelectItem value="Família">Família</SelectItem>
+                <SelectItem value="Empresarial">Empresarial</SelectItem>
+                <SelectItem value="Adesão">Adesão</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
-          <div className="overflow-x-auto">
+          {carregando ? (
+            <div className="text-center py-4">Carregando planos...</div>
+          ) : erro ? (
+            <div className="text-center py-4 text-red-500">{erro}</div>
+          ) : planosFiltrados.length === 0 ? (
+            <div className="text-center py-4">Nenhum plano encontrado.</div>
+          ) : (
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Nome</TableHead>
-                  <TableHead>Contato</TableHead>
-                  <TableHead>Plano</TableHead>
-                  <TableHead>Faixa Etária</TableHead>
-                  <TableHead>Estado</TableHead>
-                  <TableHead>Data de Registro</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Ações</TableHead>
+                  <TableHead>Operadora</TableHead>
+                  <TableHead>Tipo</TableHead>
+                  <TableHead>Cobertura</TableHead>
+                  <TableHead>Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {carregando ? (
-                  <TableRow>
-                    <TableCell colSpan={8} className="text-center py-4">
-                      Carregando...
-                    </TableCell>
-                  </TableRow>
-                ) : erro ? (
-                  <TableRow>
-                    <TableCell colSpan={8} className="text-center py-4 text-red-500">
-                      {erro}
-                    </TableCell>
-                  </TableRow>
-                ) : leadsFiltrados.length > 0 ? (
-                  leadsFiltrados.map((lead) => (
-                    <TableRow key={lead.id}>
-                      <TableCell className="font-medium">{lead.nome}</TableCell>
-                      <TableCell>
-                        <div className="flex flex-col">
-                          <span className="flex items-center">
-                            <Mail className="h-3 w-3 mr-1" /> {lead.email}
-                          </span>
-                          <span className="flex items-center mt-1">
-                            <Phone className="h-3 w-3 mr-1" /> {lead.whatsapp}
-                          </span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex flex-col">
-                          <span>{lead.plano_nome}</span>
-                          <span className="text-sm text-gray-500">{lead.plano_operadora}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>{lead.faixa_etaria}</TableCell>
-                      <TableCell>{lead.estado}</TableCell>
-                      <TableCell>{new Date(lead.data_registro).toLocaleDateString()}</TableCell>
-                      <TableCell>
-                        <Select value={lead.status} onValueChange={(value) => handleStatusChange(lead.id, value)}>
-                          <SelectTrigger className="w-[140px]">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="Novo">Novo</SelectItem>
-                            <SelectItem value="Em contato">Em contato</SelectItem>
-                            <SelectItem value="Convertido">Convertido</SelectItem>
-                            <SelectItem value="Perdido">Perdido</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button variant="ghost" size="icon" onClick={() => handleViewLead(lead)}>
-                          <Eye className="h-4 w-4" />
-                          <span className="sr-only">Ver detalhes</span>
+                {planosFiltrados.map((plano) => (
+                  <TableRow key={plano.id}>
+                    <TableCell>{plano.nome}</TableCell>
+                    <TableCell>{plano.operadora}</TableCell>
+                    <TableCell>{plano.tipo}</TableCell>
+                    <TableCell>{plano.cobertura}</TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Button variant="outline" size="icon" onClick={() => handleEditPlano(plano)}>
+                          <Pencil className="h-4 w-4" />
                         </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={8} className="text-center py-4">
-                      Nenhum lead encontrado
+                        <Button variant="outline" size="icon" onClick={() => handleDeletePlano(plano.id)}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
-                )}
+                ))}
               </TableBody>
             </Table>
-          </div>
+          )}
         </CardContent>
       </Card>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[600px]">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Detalhes do Lead</DialogTitle>
-            <DialogDescription>Informações completas do lead selecionado.</DialogDescription>
+            <DialogTitle>{isEditing ? "Editar Plano" : "Novo Plano"}</DialogTitle>
+            <DialogDescription>
+              {isEditing ? "Edite as informações do plano abaixo." : "Preencha as informações do novo plano abaixo."}
+            </DialogDescription>
           </DialogHeader>
 
-          {leadSelecionado && (
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <h3 className="text-sm font-medium text-gray-500">Nome completo</h3>
-                  <p className="mt-1">{leadSelecionado.nome}</p>
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium text-gray-500">Status</h3>
-                  <p className="mt-1">
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs ${
-                        leadSelecionado.status === "Novo"
-                          ? "bg-blue-100 text-blue-800"
-                          : leadSelecionado.status === "Em contato"
-                            ? "bg-yellow-100 text-yellow-800"
-                            : leadSelecionado.status === "Convertido"
-                              ? "bg-green-100 text-green-800"
-                              : "bg-red-100 text-red-800"
-                      }`}
-                    >
-                      {leadSelecionado.status}
-                    </span>
-                  </p>
-                </div>
+          {erro && <div className="bg-red-50 text-red-500 p-3 rounded-md mb-4">{erro}</div>}
+
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="nome">Nome do Plano *</Label>
+                <Input
+                  id="nome"
+                  value={planoAtual.nome}
+                  onChange={(e) => setPlanoAtual({ ...planoAtual, nome: e.target.value })}
+                  placeholder="Ex: Plano Premium"
+                  required
+                />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <h3 className="text-sm font-medium text-gray-500">E-mail</h3>
-                  <p className="mt-1">{leadSelecionado.email}</p>
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium text-gray-500">WhatsApp</h3>
-                  <p className="mt-1">{leadSelecionado.whatsapp}</p>
-                </div>
+              <div className="space-y-2">
+                <Label htmlFor="operadora">Operadora *</Label>
+                <Input
+                  id="operadora"
+                  value={planoAtual.operadora}
+                  onChange={(e) => setPlanoAtual({ ...planoAtual, operadora: e.target.value })}
+                  placeholder="Ex: Unimed"
+                  required
+                />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <h3 className="text-sm font-medium text-gray-500">Plano selecionado</h3>
-                  <p className="mt-1">{leadSelecionado.plano_nome}</p>
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium text-gray-500">Operadora</h3>
-                  <p className="mt-1">{leadSelecionado.plano_operadora}</p>
-                </div>
+              <div className="space-y-2">
+                <Label htmlFor="tipo">Tipo *</Label>
+                <Select
+                  value={planoAtual.tipo}
+                  onValueChange={(value) => setPlanoAtual({ ...planoAtual, tipo: value })}
+                >
+                  <SelectTrigger id="tipo">
+                    <SelectValue placeholder="Selecione o tipo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Individual">Individual</SelectItem>
+                    <SelectItem value="Família">Família</SelectItem>
+                    <SelectItem value="Empresarial">Empresarial</SelectItem>
+                    <SelectItem value="Adesão">Adesão</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
-              <div>
-                <h3 className="text-sm font-medium text-gray-500">Faixa Etária</h3>
-                <p className="mt-1">{leadSelecionado.faixa_etaria}</p>
-              </div>
-
-              <div>
-                <h3 className="text-sm font-medium text-gray-500">Estado</h3>
-                <p className="mt-1">{leadSelecionado.estado}</p>
-              </div>
-
-              <div>
-                <h3 className="text-sm font-medium text-gray-500">Data de registro</h3>
-                <p className="mt-1">{new Date(leadSelecionado.data_registro).toLocaleDateString()}</p>
-              </div>
-
-              <div className="flex justify-between mt-4">
-                <Button variant="outline" asChild>
-                  <a href={`mailto:${leadSelecionado.email}`}>
-                    <Mail className="h-4 w-4 mr-2" />
-                    Enviar e-mail
-                  </a>
-                </Button>
-                <Button variant="outline" asChild>
-                  <a
-                    href={`https://wa.me/${leadSelecionado.whatsapp.replace(/\D/g, "")}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Phone className="h-4 w-4 mr-2" />
-                    Contatar via WhatsApp
-                  </a>
-                </Button>
+              <div className="space-y-2">
+                <Label htmlFor="cobertura">Cobertura *</Label>
+                <Input
+                  id="cobertura"
+                  value={planoAtual.cobertura}
+                  onChange={(e) => setPlanoAtual({ ...planoAtual, cobertura: e.target.value })}
+                  placeholder="Ex: Nacional"
+                  required
+                />
               </div>
             </div>
-          )}
+
+            <div className="space-y-2">
+              <Label htmlFor="descricao">Descrição</Label>
+              <Textarea
+                id="descricao"
+                value={planoAtual.descricao}
+                onChange={(e) => setPlanoAtual({ ...planoAtual, descricao: e.target.value })}
+                placeholder="Descreva os detalhes e benefícios do plano"
+                rows={4}
+              />
+            </div>
+
+            <div className="space-y-4">
+              <Label>Preços por Faixa Etária *</Label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {precos.map((preco) => (
+                  <div key={preco.faixa_etaria} className="space-y-2">
+                    <Label htmlFor={`preco-${preco.faixa_etaria}`} className="text-sm">
+                      {preco.faixa_etaria} anos
+                    </Label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">R$</span>
+                      <Input
+                        id={`preco-${preco.faixa_etaria}`}
+                        type="text"
+                        inputMode="numeric"
+                        value={preco.preco === 0 ? "" : preco.preco.toString().replace(".", ",")}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/[^\d,]/g, "")
+                          const numericValue = Number.parseFloat(value.replace(",", ".")) || 0
+                          setPrecos(
+                            precos.map((p) =>
+                              p.faixa_etaria === preco.faixa_etaria ? { ...p, preco: numericValue } : p,
+                            ),
+                          )
+                        }}
+                        className="pl-8"
+                        placeholder="0,00"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+              Cancelar
+            </Button>
+            <Button onClick={handleSavePlano} disabled={carregando}>
+              {carregando ? "Salvando..." : isEditing ? "Salvar Alterações" : "Adicionar Plano"}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
   )
 }
+
