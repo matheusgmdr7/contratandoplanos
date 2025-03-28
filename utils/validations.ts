@@ -29,4 +29,3 @@ export function validarCPF(cpf: string) {
 
   return true
 }
-
