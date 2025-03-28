@@ -77,4 +77,3 @@ export interface ResumoComissoes {
   totalPago: number
   porMes: { [mes: string]: number }
 }
-
