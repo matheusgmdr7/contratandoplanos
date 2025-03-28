@@ -7,7 +7,7 @@ export default function RedirectPage() {
   const router = useRouter()
 
   useEffect(() => {
-    router.push("/corretor/(dashboard)/dashboard")
+    router.push("/corretor")
   }, [router])
 
   return (
