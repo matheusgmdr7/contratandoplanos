@@ -236,4 +236,3 @@ export async function exportToExcel(propostas: any[]) {
     throw error
   }
 }
-
