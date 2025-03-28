@@ -66,3 +66,21 @@ export default function StatCard({
   )
 }
 
+// Não é necessário alterar o código, apenas explicar de onde vem o valor
+
+// O valor exibido no h3 vem da prop "value" que é passada para este componente
+// quando ele é usado em outros arquivos, como no dashboard administrativo.
+//
+// Por exemplo, em app/admin/(auth)/page.tsx, o componente é usado assim:
+//
+// <StatCard
+//   title="Total de Clientes"
+//   value="1,248"
+//   icon={Users}
+//   trend="up"
+//   trendValue="12% este mês"
+//   color="primary"
+// />
+//
+// Neste caso, o valor "1,248" é passado como prop e exibido no h3.
+
