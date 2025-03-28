@@ -1,13 +1,81 @@
 export type Database = {
   public: {
     Tables: {
-      // Defina suas tabelas aqui se necessário
+      comissoes: {
+        Row: any
+        Insert: any
+        Update: any
+      }
+      corretores: {
+        Row: any
+        Insert: any
+        Update: any
+      }
+      leads: {
+        Row: any
+        Insert: any
+        Update: any
+      }
+      planos: {
+        Row: any
+        Insert: any
+        Update: any
+      }
+      propostas: {
+        Row: any
+        Insert: any
+        Update: any
+      }
+      produtos_corretores: {
+        Row: any
+        Insert: any
+        Update: any
+      }
+      dependentes: {
+        Row: any
+        Insert: any
+        Update: any
+      }
+      documentos: {
+        Row: any
+        Insert: any
+        Update: any
+      }
+      questionario_saude: {
+        Row: any
+        Insert: any
+        Update: any
+      }
+      precos_planos: {
+        Row: any
+        Insert: any
+        Update: any
+      }
+      propostas_corretores: {
+        Row: any
+        Insert: any
+        Update: any
+      }
+      documentos_propostas_corretores: {
+        Row: any
+        Insert: any
+        Update: any
+      }
     }
     Views: {
       // Defina suas views aqui se necessário
     }
     Functions: {
       // Defina suas funções aqui se necessário
+      resumo_comissoes: {
+        Args: {}
+        Returns: {
+          totalpendente: number
+          totalpago: number
+          pormes: { [key: string]: number }
+        }
+      }
     }
   }
 }
+
