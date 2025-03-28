@@ -115,4 +115,3 @@ export async function createAdminUser(email: string, password: string) {
     throw error
   }
 }
-
