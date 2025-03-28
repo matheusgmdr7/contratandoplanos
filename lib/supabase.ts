@@ -50,4 +50,3 @@ const testConnection = async () => {
 if (supabaseUrl && supabaseAnonKey) {
   testConnection()
 }
-
