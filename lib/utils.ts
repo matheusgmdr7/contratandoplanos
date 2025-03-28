@@ -11,4 +11,3 @@ export function formatarMoeda(valor: number): string {
     currency: "BRL",
   }).format(valor)
 }
-
