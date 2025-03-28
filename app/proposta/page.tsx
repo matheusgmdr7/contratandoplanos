@@ -953,4 +953,3 @@ export default function PropostaPage() {
     </>
   )
 }
-
