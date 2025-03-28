@@ -14,7 +14,6 @@ export type Database = {
           created_at: string
         }
         Insert: {
-          id?: string
           corretor_id: string
           proposta_id: string
           valor: number
@@ -24,12 +23,8 @@ export type Database = {
           data_pagamento?: string | null
         }
         Update: {
-          id?: string
-          corretor_id?: string
-          proposta_id?: string
           valor?: number
           percentual?: string
-          data?: string
           status?: string
           data_pagamento?: string | null
         }
@@ -49,7 +44,6 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          id?: string
           nome: string
           email: string
           telefone: string
@@ -60,7 +54,6 @@ export type Database = {
           estado: string
         }
         Update: {
-          id?: string
           nome?: string
           email?: string
           telefone?: string
@@ -230,7 +223,7 @@ export type Database = {
         Insert: any
         Update: any
       }
-       propostas_corretores: {
+      propostas_corretores: {
         Row: any
         Insert: any
         Update: any
