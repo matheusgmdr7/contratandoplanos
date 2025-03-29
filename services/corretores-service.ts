@@ -55,7 +55,16 @@ export async function buscarCorretorPorEmail(email: string): Promise<Corretor | 
 
 export async function criarCorretor(corretor: Omit<Corretor, "id" | "created_at">): Promise<Corretor> {
   try {
-    // Remova o campo 'cidade' se ele não existir na tabela
+    console.log("Criando corretor com dados:", JSON.stringify(corretor, null, 2))
+
+    // Primeiro, verificar se o corretor já existe
+    const corretorExistente = await buscarCorretorPorEmail(corretor.email)
+    if (corretorExistente) {
+      console.log("Corretor já existe, retornando dados existentes")
+      return corretorExistente
+    }
+
+    // Criar registro na tabela corretores
     const { data, error } = await supabase
       .from("corretores")
       .insert([
@@ -80,6 +89,7 @@ export async function criarCorretor(corretor: Omit<Corretor, "id" | "created_at"
       throw new Error("Erro ao criar corretor: Dados não retornados")
     }
 
+    console.log("Corretor criado com sucesso:", data)
     return data
   } catch (error) {
     console.error("Erro ao criar corretor:", error)
