@@ -215,6 +215,15 @@ export default function CorretorProdutosPage() {
 
                   <div>
                     <h3 className="font-medium mb-2">Características</h3>
+                    {/* 
+                      Nota: As características são definidas na tabela "produtos_corretores" no Supabase.
+                      Você pode editar estas informações de duas formas:
+                      1. No painel de administração em /admin/produtos-corretores
+                      2. Diretamente no Supabase Dashboard na tabela "produtos_corretores"
+                      
+                      O campo "caracteristicas" deve ser um array de strings.
+                      Se não houver características definidas, o sistema exibirá as características padrão abaixo.
+                    */}
                     <ul className="list-disc pl-5 text-gray-600 space-y-1">
                       {produtoSelecionado.caracteristicas ? (
                         produtoSelecionado.caracteristicas.map((caracteristica, index) => (
@@ -224,9 +233,6 @@ export default function CorretorProdutosPage() {
                         <>
                           <li>Cobertura nacional</li>
                           <li>Rede credenciada de qualidade</li>
-                          <li>Atendimento 24 horas</li>
-                          <li>Reembolso para procedimentos fora da rede</li>
-                          <li>Telemedicina inclusa</li>
                         </>
                       )}
                     </ul>
