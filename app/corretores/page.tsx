@@ -15,6 +15,7 @@ import { Camera, CheckCircle2, ChevronRight, Shield, Award, BarChart3 } from "lu
 import Image from "next/image"
 import Link from "next/link"
 import { motion } from "framer-motion"
+import { supabase } from "@/lib/supabase"
 
 const ESTADOS = [
   "AC",
@@ -85,19 +86,43 @@ export default function CorretoresPage() {
     }
 
     try {
-      // Aqui você implementaria a lógica para fazer upload da foto
-      // e salvar os dados do corretor no banco de dados
+      console.log("Iniciando cadastro para:", formData.email)
 
-      // Simulando o cadastro usando o serviço existente
-      await criarCorretor({
+      // 1. Criar usuário no Supabase Auth
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.senha,
+        options: {
+          data: {
+            role: "corretor",
+            nome: formData.nome,
+          },
+        },
+      })
+
+      if (authError) {
+        console.error("Erro ao criar usuário no Auth:", authError)
+        setErro(`Erro ao criar conta: ${authError.message}`)
+        setCarregando(false)
+        return
+      }
+
+      console.log("Usuário criado no Auth com sucesso")
+
+      // 2. Criar registro na tabela corretores
+      const corretor = await criarCorretor({
         nome: formData.nome,
         email: formData.email,
         whatsapp: formData.whatsapp,
         estado: formData.estado,
         // Não enviamos o campo cidade
-        status: "pendente",
-        // Outros campos seriam adicionados em uma implementação real
+        status: "pendente", // Corretor começa como pendente
       })
+
+      console.log("Corretor criado com sucesso:", corretor)
+
+      // Aqui você implementaria a lógica para fazer upload da foto
+      // e salvar os dados do corretor no banco de dados
 
       setSucesso(true)
       setFormData({
@@ -505,7 +530,7 @@ export default function CorretoresPage() {
                         <div className="text-center mt-6 text-sm text-gray-500">
                           Já tem uma conta?{" "}
                           <Link href="/corretor/login" className="text-[#168979] hover:underline font-medium">
-                            Faça login
+                            Fa��a login
                           </Link>
                         </div>
                       </form>
@@ -596,3 +621,4 @@ export default function CorretoresPage() {
     </>
   )
 }
+
