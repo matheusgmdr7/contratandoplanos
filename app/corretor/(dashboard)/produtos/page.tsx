@@ -13,7 +13,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Search, FileText, Download } from "lucide-react"
-import Image from "next/image"
 import { buscarProdutosCorretores } from "@/services/produtos-corretores-service"
 
 export default function CorretorProdutosPage() {
@@ -124,12 +123,23 @@ export default function CorretorProdutosPage() {
               <CardHeader>
                 <div className="flex items-center gap-4">
                   <div className="w-16 h-16 relative flex-shrink-0">
-                    <Image
-                      src={produto.logo_url || "/placeholder.svg?height=80&width=80"}
-                      alt={produto.operadora || "Logo"}
-                      fill
-                      style={{ objectFit: "contain" }}
-                    />
+                    {produto.logo ? (
+                      <img
+                        src={produto.logo || "/placeholder.svg?height=80&width=80"}
+                        alt={produto.operadora || "Logo"}
+                        className="w-full h-full object-contain"
+                        onError={(e) => {
+                          e.target.src = "/placeholder.svg?height=80&width=80"
+                          e.target.alt = "Logo indisponível"
+                        }}
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gray-200 rounded-md flex items-center justify-center">
+                        <span className="text-gray-500 text-xs">
+                          {produto.operadora ? produto.operadora.substring(0, 2).toUpperCase() : "PL"}
+                        </span>
+                      </div>
+                    )}
                   </div>
                   <div>
                     <CardTitle className="text-lg">{produto.nome}</CardTitle>
@@ -171,12 +181,25 @@ export default function CorretorProdutosPage() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 py-4">
                 <div className="md:col-span-1 flex flex-col items-center">
                   <div className="w-32 h-32 relative mb-4">
-                    <Image
-                      src={produtoSelecionado.logo_url || "/placeholder.svg?height=128&width=128"}
-                      alt={produtoSelecionado.operadora || "Logo"}
-                      fill
-                      style={{ objectFit: "contain" }}
-                    />
+                    {produtoSelecionado.logo ? (
+                      <img
+                        src={produtoSelecionado.logo || "/placeholder.svg?height=128&width=128"}
+                        alt={produtoSelecionado.operadora || "Logo"}
+                        className="w-full h-full object-contain"
+                        onError={(e) => {
+                          e.target.src = "/placeholder.svg?height=128&width=128"
+                          e.target.alt = "Logo indisponível"
+                        }}
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gray-200 rounded-md flex items-center justify-center">
+                        <span className="text-gray-500 text-lg">
+                          {produtoSelecionado.operadora
+                            ? produtoSelecionado.operadora.substring(0, 2).toUpperCase()
+                            : "PL"}
+                        </span>
+                      </div>
+                    )}
                   </div>
                   <div className="text-center">
                     <p className="font-medium">Comissão</p>
@@ -243,3 +266,4 @@ export default function CorretorProdutosPage() {
     </div>
   )
 }
+
