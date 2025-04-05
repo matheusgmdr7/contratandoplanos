@@ -530,7 +530,7 @@ export default function CorretoresPage() {
                         <div className="text-center mt-6 text-sm text-gray-500">
                           Já tem uma conta?{" "}
                           <Link href="/corretor/login" className="text-[#168979] hover:underline font-medium">
-                            Fa��a login
+                            Faça login
                           </Link>
                         </div>
                       </form>
