@@ -5,7 +5,7 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { BarChart, Users, Package, Menu, X, LogOut, User, ChevronDown, ChevronRight } from "lucide-react"
+import { BarChart, Users, Package, Menu, X, LogOut, User, ChevronDown, ChevronRight, Table } from "lucide-react"
 import { signOutAdmin } from "@/lib/supabase-auth"
 
 export default function AdminSidebar() {
@@ -144,6 +144,19 @@ export default function AdminSidebar() {
                 </Link>
               </li>
 
+              <li>
+                <Link
+                  href="/admin/tabelas"
+                  className={`flex items-center p-2 text-base font-normal rounded-lg hover:bg-gray-100 ${
+                    isActive("/admin/tabelas") ? "bg-gray-100 font-medium" : ""
+                  }`}
+                  onClick={closeSidebar}
+                >
+                  <Table className="w-5 h-5 text-gray-500" />
+                  <span className="ml-3">Tabelas de Preços</span>
+                </Link>
+              </li>
+
               {/* Seção de Corretores com expansão/colapso */}
               <li className="pt-3 mt-3">
                 <button
@@ -232,3 +245,4 @@ export default function AdminSidebar() {
     </>
   )
 }
+
