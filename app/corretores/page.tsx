@@ -580,33 +580,18 @@ export default function CorretoresPage() {
                         <Award className="h-6 w-6" />
                       </div>
                       <div>
-                        <h3 className="text-xl font-semibold mb-2">Leas Aquecidos</h3>
+                        <h3 className="text-xl font-semibold mb-2">Mais Vendas</h3>
                         <p className="text-white/80">
-                          Receba leads aquecidos da nossa plataforma.
+                          Receba leads aquecidos diretamnete da nossa plataforma.
                         </p>
                       </div>
                     </div>
                   </div>
 
                   <div className="mt-10 pt-6 border-t border-white/20">
-                    <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-                      <div className="text-center md:text-left">
-                        <p className="text-white/80 mb-1">Junte-se a mais de</p>
-                        <p className="text-3xl font-bold">500+ Corretores</p>
-                      </div>
-                      <div className="flex -space-x-4">
-                        {[1, 2, 3, 4, 5].map((i) => (
-                          <div
-                            key={i}
-                            className="w-12 h-12 rounded-full bg-white/30 border-2 border-white overflow-hidden"
-                          >
-                            <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300"></div>
-                          </div>
-                        ))}
-                        <div className="w-12 h-12 rounded-full bg-white/90 border-2 border-white flex items-center justify-center text-[#168979] font-bold">
-                          +
-                        </div>
-                      </div>
+                    <div className="text-center">
+                      <p className="text-white/80 mb-1">Junte-se a mais de</p>
+                      <p className="text-3xl font-bold">500+ Corretores</p>
                     </div>
                   </div>
                 </div>
