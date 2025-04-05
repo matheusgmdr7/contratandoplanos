@@ -7,7 +7,7 @@ import { useRouter, usePathname } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { LayoutDashboard, FileText, Package, LogOut, Menu, X, DollarSign } from "lucide-react"
+import { LayoutDashboard, FileText, Package, LogOut, Menu, X, DollarSign, Table } from "lucide-react"
 import { Spinner } from "@/components/ui/spinner"
 import { verificarAutenticacao, logout } from "@/services/auth-corretores-simples"
 import { supabase } from "@/lib/supabase"
@@ -121,6 +121,11 @@ export default function CorretorDashboardLayout({
       href: "/corretor/produtos",
       label: "Produtos",
       icon: Package,
+    },
+    {
+      href: "/corretor/tabelas",
+      label: "Tabelas",
+      icon: Table,
     },
   ]
 
@@ -317,3 +322,4 @@ export default function CorretorDashboardLayout({
     </div>
   )
 }
+
