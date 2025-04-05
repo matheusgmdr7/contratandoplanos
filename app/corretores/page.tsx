@@ -558,7 +558,7 @@ export default function CorretoresPage() {
                       <div>
                         <h3 className="text-xl font-semibold mb-2">Dashboard Completo</h3>
                         <p className="text-white/80">
-                          Acompanhe suas propostas e comissões em tempo real com um painel intuitivo e completo.
+                          Acompanhe suas propostas em tempo real com um painel intuitivo e completo.
                         </p>
                       </div>
                     </div>
@@ -580,10 +580,9 @@ export default function CorretoresPage() {
                         <Award className="h-6 w-6" />
                       </div>
                       <div>
-                        <h3 className="text-xl font-semibold mb-2">Suporte Especializado</h3>
+                        <h3 className="text-xl font-semibold mb-2">Leas Aquecidos</h3>
                         <p className="text-white/80">
-                          Conte com nossa equipe de especialistas para tirar dúvidas e auxiliar em todo o processo de
-                          venda.
+                          Receba leads aquecidos da nossa plataforma.
                         </p>
                       </div>
                     </div>
