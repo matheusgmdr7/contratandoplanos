@@ -124,7 +124,7 @@ export default function CorretorDashboardLayout({
     },
     {
       href: "/corretor/tabelas",
-      label: "Tabelas",
+      label: "Tabela de Preços",
       icon: Table,
     },
   ]
