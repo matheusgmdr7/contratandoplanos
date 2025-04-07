@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Switch } from "@/components/ui/switch"
+import { Switch } from "@/components/ui/switch" // Explicitly import Switch
 import { supabase } from "@/lib/supabase"
 
 export default function ModelosPropostasPage() {
