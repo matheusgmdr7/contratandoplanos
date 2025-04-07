@@ -38,3 +38,4 @@ export function formatarCPF(cpf: string): string {
 
   return cpf
 }
+
