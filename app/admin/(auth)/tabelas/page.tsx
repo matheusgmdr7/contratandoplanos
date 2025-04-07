@@ -18,7 +18,7 @@ import {
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch" // Explicitly import Switch
-import { Search, Plus, Edit, Trash2, X } from "lucide-react"
+import { Search, Plus, Edit, Trash2 } from "lucide-react"
 import { Spinner } from "@/components/ui/spinner"
 import { PageHeader } from "@/components/admin/page-header"
 import {
@@ -292,208 +292,219 @@ export default function TabelasAdminPage() {
     }
   }
 
-  return (
-      <div className="space-y-6">
-        <PageHeader
-          title="Tabelas de Preços"
-          description="Gerencie as tabelas de preços por faixa etária para os corretores"
-        />
+  // Declare formmData and X
+  let formmData: any
+  let X: any
 
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div className="relative w-full md:w-64">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Buscar tabelas..."
-              className="pl-8 w-full"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
+  return (
+    <div className="space-y-6">
+      <PageHeader
+        title="Tabelas de Preços"
+        description="Gerencie as tabelas de preços por faixa etária para os corretores"
+        action={
           <Button onClick={() => handleOpenDialog()}>
             <Plus className="mr-2 h-4 w-4" />
             Nova Tabela
           </Button>
+        }
+      />
+
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="relative w-full md:w-64">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+          <Input
+            type="search"
+            placeholder="Buscar tabelas..."
+            className="pl-10 w-full"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </div>
+        <Button onClick={() => handleOpenDialog()}>
+          <Plus className="mr-2 h-4 w-4" />
+          Nova Tabela
+        </Button>
+      </div>
 
-        {loading ? (
-          <div className="flex items-center justify-center h-64">
-            <Spinner />
-            <span className="ml-2">Carregando tabelas...</span>
-          </div>
-        ) : (
-          <Card>
-            <CardHeader>
-              <CardTitle>Tabelas de Preços</CardTitle>
-              <CardDescription>Gerencie as tabelas de preços disponíveis para os corretores</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {filteredTabelas.length === 0 ? (
-                <div className="text-center py-10">
-                  <h3 className="text-lg font-semibold">Nenhuma tabela encontrada</h3>
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    {searchTerm
-                      ? "Não encontramos tabelas correspondentes à sua busca."
-                      : "Clique em 'Nova Tabela' para adicionar uma tabela de preços."}
-                  </p>
-                </div>
-              ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Produto</TableHead>
-                      <TableHead>Corretora</TableHead>
-                      <TableHead className="hidden md:table-cell">Status</TableHead>
-                      <TableHead className="hidden md:table-cell">Atualização</TableHead>
-                      <TableHead className="text-right">Ações</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredTabelas.map((tabela) => (
-                      <TableRow key={tabela.id}>
-                        <TableCell className="font-medium">{tabela.titulo}</TableCell>
-                        <TableCell>{tabela.corretora}</TableCell>
-                        <TableCell className="hidden md:table-cell">
-                          <span
-                            className={`px-2 py-1 rounded-full text-xs ${tabela.ativo ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}`}
-                          >
-                            {tabela.ativo ? "Ativo" : "Inativo"}
-                          </span>
-                        </TableCell>
-                        <TableCell className="hidden md:table-cell">
-                          {new Date(tabela.updated_at).toLocaleDateString("pt-BR")}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleToggleStatus(tabela.id, tabela.ativo)}
-                            >
-                              {tabela.ativo ? "Desativar" : "Ativar"}
-                            </Button>
-                            <Button variant="outline" size="sm" onClick={() => handleOpenDialog(tabela)}>
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button variant="outline" size="sm" onClick={() => handleExcluirTabela(tabela.id)}>
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )}
-            </CardContent>
-          </Card>
-        )}
-
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>{editingTabela ? "Editar Tabela de Preços" : "Nova Tabela de Preços"}</DialogTitle>
-              <DialogDescription>
-                {editingTabela
-                  ? "Atualize as informações da tabela de preços"
-                  : "Preencha as informações para criar uma nova tabela de preços"}
-              </DialogDescription>
-            </DialogHeader>
-            <form onSubmit={handleSubmit} className="grid gap-4 py-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="titulo">Título (Produto) *</Label>
-                  <Input
-                    id="titulo"
-                    name="titulo"
-                    value={formData.titulo}
-                    onChange={handleInputChange}
-                    placeholder="Ex: Plano Saúde Total"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="corretora">Corretora *</Label>
-                  <Input
-                    id="corretora"
-                    name="corretora"
-                    value={formData.corretora}
-                    onChange={handleInputChange}
-                    placeholder="Ex: Amil"
-                    required
-                  />
-                </div>
+      {loading ? (
+        <div className="flex items-center justify-center h-64">
+          <Spinner />
+          <span className="ml-2">Carregando tabelas...</span>
+        </div>
+      ) : (
+        <Card>
+          <CardHeader>
+            <CardTitle>Tabelas de Preços</CardTitle>
+            <CardDescription>Gerencie as tabelas de preços disponíveis para os corretores</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {filteredTabelas.length === 0 ? (
+              <div className="text-center py-10">
+                <h3 className="text-lg font-semibold">Nenhuma tabela encontrada</h3>
+                <p className="mt-2 text-sm text-gray-500">
+                  {searchTerm
+                    ? "Não encontramos tabelas correspondentes à sua busca."
+                    : "Clique em 'Nova Tabela' para adicionar uma tabela de preços."}
+                </p>
               </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Produto</TableHead>
+                    <TableHead>Corretora</TableHead>
+                    <TableHead className="hidden md:table-cell">Status</TableHead>
+                    <TableHead className="hidden md:table-cell">Atualização</TableHead>
+                    <TableHead className="text-right">Ações</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredTabelas.map((tabela) => (
+                    <TableRow key={tabela.id}>
+                      <TableCell className="font-medium">{tabela.titulo}</TableCell>
+                      <TableCell>{tabela.corretora}</TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs ${
+                            tabela.ativo ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
+                          }`}
+                        >
+                          {tabela.ativo ? "Ativo" : "Inativo"}
+                        </span>
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        {new Date(tabela.updated_at).toLocaleDateString("pt-BR")}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleToggleStatus(tabela.id, tabela.ativo)}
+                          >
+                            {tabela.ativo ? "Desativar" : "Ativar"}
+                          </Button>
+                          <Button variant="outline" size="sm" onClick={() => handleOpenDialog(tabela)}>
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button variant="outline" size="sm" onClick={() => handleExcluirTabela(tabela.id)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{editingTabela ? "Editar Tabela de Preços" : "Nova Tabela de Preços"}</DialogTitle>
+            <DialogDescription>
+              {editingTabela
+                ? "Atualize as informações da tabela de preços"
+                : "Preencha as informações para criar uma nova tabela de preços"}
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSubmit} className="grid gap-4 py-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="descricao">Descrição</Label>
-                <Textarea
-                  id="descricao"
-                  name="descricao"
-                  value={formData.descricao}
+                <Label htmlFor="titulo">Título (Produto) *</Label>
+                <Input
+                  id="titulo"
+                  name="titulo"
+                  value={formData.titulo}
                   onChange={handleInputChange}
-                  placeholder="Descrição opcional da tabela de preços"
-                  rows={3}
+                  placeholder="Ex: Plano Saúde Total"
+                  required
                 />
               </div>
-              <div className="flex items-center space-x-2">
-                <Switch id="ativo" checked={formData.ativo} onCheckedChange={handleSwitchChange} />
-                <Label htmlFor="ativo">Tabela ativa</Label>
-              </div>
-
-              <div className="space-y-4 mt-4">
-                <div className="flex items-center justify-between">
-                  <h4 className="text-sm font-medium">Faixas Etárias e Valores</h4>
-                  <Button type="button" variant="outline" size="sm" onClick={handleAddFaixaEtaria}>
-                    <Plus className="h-4 w-4 mr-1" /> Adicionar Faixa
-                  </Button>
-                </div>
-
-                <div className="space-y-2">
-                  {faixasEtarias.map((faixa, index) => (
-                    <div key={index} className="flex items-center gap-2">
-                      <div className="flex-1">
-                        <Label htmlFor={`faixa_etaria_${index}`}>Faixa Etária</Label>
-                        <Input
-                          id={`faixa_etaria_${index}`}
-                          value={faixa.faixa_etaria}
-                          onChange={(e) => {
-                            const novasFaixas = [...faixasEtarias]
-                            novasFaixas[index].faixa_etaria = e.target.value
-                            setFaixasEtarias(novasFaixas)
-                          }}
-                          placeholder="Faixa etária (ex: 0-18)"
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <Label htmlFor={`valor_${index}`}>Valor (R$)</Label>
-                        <Input
-                          id={`valor_${index}`}
-                          type="number"
-                          step="0.01"
-                          min="0"
-                          value={faixa.valor}
-                          onChange={(e) => handleFaixaEtariaChange(index, e.target.value)}
-                          placeholder="Valor (R$)"
-                        />
-                      </div>
-                      <Button type="button" variant="ghost" size="icon" onClick={() => handleRemoveFaixaEtaria(index)}>
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
+              <div className="space-y-2">
+                <Label htmlFor="corretora">Corretora *</Label>
+                <Input
+                  id="corretora"
+                  name="corretora"
+                  value={formData.corretora}
+                  onChange={handleInputChange}
+                  placeholder="Ex: Amil"
+                  required
+                />
               </div>
             </div>
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
-                Cancelar
-              </Button>
-              <Button type="submit">Salvar</Button>
-            </DialogFooter>
+            <div className="space-y-2">
+              <Label htmlFor="descricao">Descrição</Label>
+              <Textarea
+                id="descricao"
+                name="descricao"
+                value={formData.descricao}
+                onChange={handleInputChange}
+                placeholder="Descrição opcional da tabela de preços"
+                rows={3}
+              />
+            </div>
+            <div className="flex items-center space-x-2">
+              <Switch id="ativo" checked={formData.ativo} onCheckedChange={handleSwitchChange} />
+              <Label htmlFor="ativo">Tabela ativa</Label>
+            </div>
+
+            <div className="space-y-4 mt-4">
+              <div className="flex items-center justify-between">
+                <h4 className="text-sm font-medium">Faixas Etárias e Valores</h4>
+                <Button type="button" variant="outline" size="sm" onClick={handleAddFaixaEtaria}>
+                  <Plus className="h-4 w-4 mr-1" /> Adicionar Faixa
+                </Button>
+              </div>
+
+              <div className="space-y-2">
+                {faixasEtarias.map((faixa, index) => (
+                  <div key={index} className="flex items-center gap-2">
+                    <div className="flex-1">
+                      <Label htmlFor={`faixa_etaria_${index}`}>Faixa Etária</Label>
+                      <Input
+                        id={`faixa_etaria_${index}`}
+                        value={faixa.faixa_etaria}
+                        onChange={(e) => {
+                          const novasFaixas = [...faixasEtarias]
+                          novasFaixas[index].faixa_etaria = e.target.value
+                          setFaixasEtarias(novasFaixas)
+                        }}
+                        placeholder="Faixa etária (ex: 0-18)"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <Label htmlFor={`valor_${index}`}>Valor (R$)</Label>
+                      <Input
+                        id={`valor_${index}`}
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={faixa.valor}
+                        onChange={(e) => handleFaixaEtariaChange(index, e.target.value)}
+                        placeholder="Valor (R$)"
+                      />
+                    </div>
+                    <Button type="button" variant="ghost" size="icon" onClick={() => handleRemoveFaixaEtaria(index)}>
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
           </form>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
+              Cancelar
+            </Button>
+            <Button type="submit">Salvar</Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
-  </div>
+    </div>
   )
 }
 
