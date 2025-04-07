@@ -113,7 +113,7 @@ export default function CorretorLoginPage() {
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               Ainda não tem uma conta?{" "}
-              <Link href="/corretor/cadastro" className="text-[#168979] hover:underline">
+              <Link href="/corretores" className="text-[#168979] hover:underline">
                 Cadastre-se
               </Link>
             </p>
