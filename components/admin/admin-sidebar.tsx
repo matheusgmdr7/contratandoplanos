@@ -277,22 +277,24 @@ export default function AdminSidebar() {
        onClick={handleLogout}
      >
        <div className="p-4 border-t">
-            <button
-              onClick={handleLogout}
-              type="button"
-              disabled={isLoggingOut}
-              className="flex w-full items-center p-2 text-base font-normal text-red-500 rounded-lg hover:bg-red-50 disabled:opacity-50"
-            >
-              <LogOut className="w-5 h-5" />
-              <span className="ml-3">{isLoggingOut ? "Saindo..." : "Sair"}</span>
-            </button>
-          </div>
-        </Button>
-      </aside>
+         <button
+           onClick={handleLogout}
+           type="button"
+           disabled={isLoggingOut}
+           className="flex w-full items-center p-2 text-base font-normal text-red-500 rounded-lg hover:bg-red-50 disabled:opacity-50"
+         >
+           <LogOut className="w-5 h-5" />
+           <span className="ml-3">{isLoggingOut ? "Saindo..." : "Sair"}</span>
+         </button>
+       </div>
+     </Button>
+   </aside>
 
-      {/* Content - adjusted to give space to the sidebar */}
-      <div className="md:ml-64 lg:ml-72">
-        {/* Este div é apenas para empurrar o conteúdo para a direita em telas maiores */}
-      </div>
-    </>
+   {/* Content - adjusted to give space to the sidebar */}
+   <div className="md:ml-64 lg:ml-72">
+     {/* Este div é apenas para empurrar o conteúdo para a direita em telas maiores */}
+   </div>
+ </>
+ );
+}
 
