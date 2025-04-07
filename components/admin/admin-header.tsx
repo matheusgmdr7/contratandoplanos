@@ -4,7 +4,8 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { supabase } from "@/lib/supabase-auth"
 import Link from "next/link"
-import { Bell, Search, Settings, User } from "lucide-react"
+import { Settings, User, LogOut } from "lucide-react"
+import { signOutAdmin } from "@/lib/supabase-auth"
 
 export default function AdminHeader() {
   const [userEmail, setUserEmail] = useState<string | null>(null)
@@ -36,31 +37,33 @@ export default function AdminHeader() {
     getUserInfo()
   }, [router])
 
+  const handleLogout = async () => {
+    try {
+      await signOutAdmin()
+      router.push("/admin/login")
+    } catch (error) {
+      console.error("Erro ao fazer logout:", error)
+    }
+  }
+
   return (
-    <header className="bg-white border-b border-gray-200 py-4 px-6 flex items-center justify-between sticky top-0 z-10 shadow-sm">
+    <header className="bg-white border-b border-gray-200 py-4 px-6 flex items-center justify-between sticky top-0 z-10 shadow-sm md:px-4">
       <div className="flex items-center">
+        <Link href="/admin" className="text-xl font-bold text-[#168979] block md:hidden">
+          Contratandoplanos
+        </Link>
         <Link href="/admin" className="text-xl font-bold text-[#168979] hidden md:block">
           Contratandoplanos <span className="text-gray-500 font-normal">Admin</span>
         </Link>
       </div>
 
       <div className="flex-1 max-w-xl mx-4 hidden md:block">
-        <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Search className="h-4 w-4 text-gray-400" />
-          </div>
-          <input
-            type="text"
-            placeholder="Buscar..."
-            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#168979] focus:border-transparent"
-          />
-        </div>
+        <div className="relative"></div>
       </div>
 
       <div className="flex items-center space-x-4">
-        <button className="p-2 rounded-full hover:bg-gray-100 relative">
-          <Bell className="h-5 w-5 text-gray-500" />
-          <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full"></span>
+        <button className="p-2 rounded-full hover:bg-gray-100" onClick={handleLogout}>
+          <LogOut className="h-5 w-5 text-gray-500" />
         </button>
 
         <button className="p-2 rounded-full hover:bg-gray-100">
