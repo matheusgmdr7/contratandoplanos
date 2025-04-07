@@ -348,7 +348,7 @@ export default function ModelosPropostasPage() {
               <Label htmlFor="ativo">Ativo</Label>
             </div>
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={handleCloseDialog}>
+              <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
                 Cancelar
               </Button>
               <Button type="submit">Salvar</Button>
