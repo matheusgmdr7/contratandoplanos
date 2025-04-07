@@ -245,7 +245,7 @@ export default function CorretoresPage() {
                         </div>
                         <h3 className="text-xl font-semibold mb-2">Cadastro Concluído!</h3>
                         <p className="text-gray-600 mb-6">
-                          Você já pode acessar o Corretor Digital e começar a utilizar todas as ferramentas disponíveis.
+                          Aguarde a confirmação do seu cadstro, para poder acessar o Corretor Digital e começar a utilizar todas as ferramentas disponíveis.
                         </p>
                         <motion.div
                           initial={{ scale: 1 }}
