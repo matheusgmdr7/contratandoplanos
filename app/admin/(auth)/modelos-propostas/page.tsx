@@ -100,7 +100,7 @@ export default function ModelosPropostasPage() {
   const handleOpenDialog = async (modelo?: ModeloProposta) => {
     setSelectedModelo(modelo || null)
     setFormData({
-      titulo: modelo?.titulo || "",
+      titulo: "",
       produto_id: modelo?.produto_id || "",
       descricao: modelo?.descricao || "",
       arquivo: null,
