@@ -15,7 +15,7 @@ export default function AdminLayout({
         <div className="flex-1 flex flex-col">
           <AdminHeader />
           <main className="flex-1 p-6 md:p-8 overflow-x-auto">
-            <div className="max-w-7xl mx-auto">{children}</div>
+            <div>{children}</div>
           </main>
           <footer className="py-4 px-6 text-center text-sm text-gray-500 border-t border-gray-200">
             <p>© {new Date().getFullYear()} Contratandoplanos - Painel Administrativo</p>
@@ -25,3 +25,4 @@ export default function AdminLayout({
     </AuthGuard>
   )
 }
+
