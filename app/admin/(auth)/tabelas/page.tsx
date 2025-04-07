@@ -11,13 +11,13 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Switch } from "@/components/ui/switch"
+import { Switch } from "@/components/ui/switch" // Explicitly import Switch
 import { Search, Plus, Edit, Trash2, X } from "lucide-react"
 import { Spinner } from "@/components/ui/spinner"
 import { PageHeader } from "@/components/admin/page-header"
@@ -392,105 +392,102 @@ export default function TabelasAdminPage() {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{editingTabela ? "Editar Tabela de Preços" : "Nova Tabela de Preços"}</DialogTitle>
+            <DialogTitle>{editingTabela ? "Editar Tabela de Preços" : "Novo Tabela de Preços"}</DialogTitle>
             <DialogDescription>
               {editingTabela
                 ? "Atualize as informações da tabela de preços"
                 : "Preencha as informações para criar uma nova tabela de preços"}
             </DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleSubmit}>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="titulo">Título (Produto) *</Label>
-                  <Input
-                    id="titulo"
-                    name="titulo"
-                    value={formData.titulo}
-                    onChange={handleInputChange}
-                    placeholder="Ex: Plano Saúde Total"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="corretora">Corretora *</Label>
-                  <Input
-                    id="corretora"
-                    name="corretora"
-                    value={formData.corretora}
-                    onChange={handleInputChange}
-                    placeholder="Ex: Amil"
-                    required
-                  />
-                </div>
-              </div>
+          <form onSubmit={handleSubmit} className="grid gap-4 py-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="descricao">Descrição</Label>
-                <Textarea
-                  id="descricao"
-                  name="descricao"
-                  value={formData.descricao}
+                <Label htmlFor="titulo">Título (Produto) *</Label>
+                <Input
+                  id="titulo"
+                  name="titulo"
+                  value={formData.titulo}
                   onChange={handleInputChange}
-                  placeholder="Descrição opcional da tabela de preços"
-                  rows={3}
+                  placeholder="Ex: Plano Saúde Total"
+                  required
                 />
               </div>
-              <div className="flex items-center space-x-2">
-                <Switch id="ativo" checked={formData.ativo} onCheckedChange={handleSwitchChange} />
-                <Label htmlFor="ativo">Tabela ativa</Label>
-              </div>
-
-              <div className="space-y-4 mt-4">
-                <div className="flex items-center justify-between">
-                  <h4 className="text-sm font-medium">Faixas Etárias e Valores</h4>
-                  <Button type="button" variant="outline" size="sm" onClick={handleAddFaixaEtaria}>
-                    <Plus className="h-4 w-4 mr-1" /> Adicionar Faixa
-                  </Button>
-                </div>
-
-                <div className="space-y-2">
-                  {faixasEtarias.map((faixa, index) => (
-                    <div key={index} className="flex items-center gap-2">
-                      <div className="flex-1">
-                        <Input
-                          value={faixa.faixa_etaria}
-                          onChange={(e) => {
-                            const novasFaixas = [...faixasEtarias]
-                            novasFaixas[index].faixa_etaria = e.target.value
-                            setFaixasEtarias(novasFaixas)
-                          }}
-                          placeholder="Faixa etária (ex: 0-18)"
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <Input
-                          type="number"
-                          step="0.01"
-                          min="0"
-                          value={faixa.valor}
-                          onChange={(e) => handleFaixaEtariaChange(index, e.target.value)}
-                          placeholder="Valor (R$)"
-                        />
-                      </div>
-                      <Button type="button" variant="ghost" size="icon" onClick={() => handleRemoveFaixaEtaria(index)}>
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
+              <div className="space-y-2">
+                <Label htmlFor="corretora">Corretora *</Label>
+                <Input
+                  id="corretora"
+                  name="corretora"
+                  value={formData.corretora}
+                  onChange={handleInputChange}
+                  placeholder="Ex: Amil"
+                  required
+                />
               </div>
             </div>
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
-                Cancelar
-              </Button>
-              <Button type="submit">Salvar</Button>
-            </DialogFooter>
+            <div className="space-y-2">
+              <Label htmlFor="descricao">Descrição</Label>
+              <Textarea
+                id="descricao"
+                name="descricao"
+                value={formData.descricao}
+                onChange={handleInputChange}
+                placeholder="Descrição opcional da tabela de preços"
+                rows={3}
+              />
+            </div>
+            <div className="flex items-center space-x-2">
+              <Switch id="ativo" checked={formData.ativo} onCheckedChange={handleSwitchChange} />
+              <Label htmlFor="ativo">Tabela ativa</Label>
+            </div>
+
+            <div className="space-y-4 mt-4">
+              <div className="flex items-center justify-between">
+                <h4 className="text-sm font-medium">Faixas Etárias e Valores</h4>
+                <Button type="button" variant="outline" size="sm" onClick={handleAddFaixaEtaria}>
+                  <Plus className="h-4 w-4 mr-1" /> Adicionar Faixa
+                </Button>
+              </div>
+
+              <div className="space-y-2">
+                {faixasEtarias.map((faixa, index) => (
+                  <div key={index} className="flex items-center gap-2">
+                    <div className="flex-1">
+                      <Label htmlFor={`faixa_etaria_${index}`}>Faixa Etária</Label>
+                      <Input
+                        id={`faixa_etaria_${index}`}
+                        value={faixa.faixa_etaria}
+                        onChange={(e) => {
+                          const novasFaixas = [...faixasEtarias]
+                          novasFaixas[index].faixa_etaria = e.target.value
+                          setFaixasEtarias(novasFaixas)
+                        }}
+                        placeholder="Faixa etária (ex: 0-18)"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <Label htmlFor={`valor_${index}`}>Valor (R$)</Label>
+                      <Input
+                        id={`valor_${index}`}
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={faixa.valor}
+                        onChange={(e) => handleFaixaEtariaChange(index, e.target.value)}
+                        placeholder="Valor (R$)"
+                      />
+                    </div>
+                    <Button type="button" variant="ghost" size="icon" onClick={() => handleRemoveFaixaEtaria(index)}>
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>
-    </div>
+  </div>
   )
 }
 
