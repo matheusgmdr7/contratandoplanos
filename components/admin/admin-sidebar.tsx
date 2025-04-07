@@ -5,12 +5,12 @@ import { Button } from "@/components/ui/button"
 import type React from "react"
 
 import { useState, useEffect } from "react"
+import { useRouter, usePathname } from "next/navigation"
 import Link from "next/link"
-import { usePathname, useRouter } from "next/navigation"
-import { Users, Package, Menu, X, LogOut, User, ChevronDown, ChevronRight, Table, FileDown, Home } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { Package, LogOut, Menu, X, Table, FileDown, Home, Users, ChevronDown, ChevronRight } from "lucide-react"
 import { signOutAdmin } from "@/lib/supabase-auth"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
-import { cn } from "@/lib/utils"
 
 export default function AdminSidebar() {
   const pathname = usePathname()
@@ -182,7 +182,9 @@ export default function AdminSidebar() {
                   href="/admin/modelos-propostas"
                   className={cn(
                     "flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-white",
-                    isActive("/admin/modelos-propostas") ? "bg-[#13786a] text-white" : "text-white/80 hover:bg-white/10",
+                    isActive("/admin/modelos-propostas")
+                      ? "bg-[#13786a] text-white"
+                      : "text-white/80 hover:bg-white/10",
                   )}
                   onClick={closeSidebar}
                 >
@@ -191,110 +193,113 @@ export default function AdminSidebar() {
                 </Link>
               </li>
 
-             {/* Seção de Corretores com expansão/colapso */}
-         <li className="pt-3 mt-3">
-           <button
-             onClick={toggleCorretoresSection}
-             className={`flex items-center justify-between w-full p-2 text-base font-normal rounded-lg hover:bg-gray-10 ${
-               isCorretoresSection() ? "bg-white-10 font-medium" : ""
-             }`}
-           >
-             <div className="flex items-center">
-               <User className="w-5 h-5 text-white-500" />
-               <span className="ml-3">Corretores</span>
-             </div>
-             {corretoresExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-           </button>
+              {/* Seção de Corretores com expansão/colapso */}
+              <li className="pt-3 mt-3">
+                <button
+                  onClick={toggleCorretoresSection}
+                  className={`flex items-center justify-between w-full p-2 text-base font-normal rounded-lg hover:bg-gray-10 ${
+                    isCorretoresSection() ? "bg-white-10 font-medium" : ""
+                  }`}
+                >
+                  <div className="flex items-center">
+                    <Users className="w-5 h-5 text-white-500" />
+                    <span className="ml-3">Corretores</span>
+                  </div>
+                  {corretoresExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                </button>
 
-           {/* Submenu de Corretores */}
-           {corretoresExpanded && (
-             <ul className="pl-6 mt-1 space-y-1">
-               <li>
-                 <Link
-                   href="/admin/corretores"
-                   className={cn(
-                     "flex items-center p-2 text-sm font-normal rounded-lg transition-all hover:bg-transparent", // Adicionado hover:bg-transparent e transition-all
-                     isActive("/admin/corretores") ? "bg-[#13786a] font-medium" : "text-white/80 hover:bg-white/10",
-                   )}
-                   onClick={closeSidebar}
-                 >
-                   <span>Corretores</span>
-                 </Link>
-               </li>
-               <li>
-                 <Link
-                   href="/admin/propostas-corretores"
-                   className={cn(
-                     "flex items-center p-2 text-sm font-normal rounded-lg transition-all hover:bg-transparent", // Adicionado hover:bg-transparent e transition-all
-                     isActive("/admin/propostas-corretores") ? "bg-[#13786a] font-medium" : "text-white/80 hover:bg-white/10",
-                   )}
-                   onClick={closeSidebar}
-                 >
-                   <span>Propostas</span>
-                 </Link>
-               </li>
-               <li>
-                 <Link
-                   href="/admin/produtos-corretores"
-                   className={cn(
-                     "flex items-center p-2 text-sm font-normal rounded-lg transition-all hover:bg-transparent", // Adicionado hover:bg-transparent e transition-all
-                     isActive("/admin/produtos-corretores") ? "bg-[#13786a] font-medium" : "text-white/80 hover:bg-white/10",
-                   )}
-                   onClick={closeSidebar}
-                 >
-                   <span>Produtos</span>
-                 </Link>
-               </li>
-               <li>
-                 <Link
-                   href="/admin/comissoes"
-                   className={cn(
-                     "flex items-center p-2 text-sm font-normal rounded-lg transition-all hover:bg-transparent", // Adicionado hover:bg-transparent e transition-all
-                     isActive("/admin/comissoes") ? "bg-[#13786a] font-medium" : "text-white/80 hover:bg-white/10",
-                   )}
-                   onClick={closeSidebar}
-                 >
-                   <span>Comissões</span>
-                 </Link>
-               </li>
-             </ul>
-           )}
-         </li>
-       </ul>
-     </nav>
-   </div>
-   <div className="mt-auto p-4">
-     <div className="flex flex-col items-center gap-2 rounded-lg px-3 py-2 border-t border-white/10 pt-4">
-       <Avatar className="h-16 w-16 mb-2">
-         <AvatarImage src={avatarUrl || ""} alt={corretor?.email || "Avatar do usuário"} />
-         <AvatarFallback className="bg-white/20 text-white">{getInitials(corretor?.email)}</AvatarFallback>
-       </Avatar>
-       <div className="text-sm font-medium text-center">{corretor?.email}</div>
-     </div>
-     <Button
-       variant="ghost"
-       className="mt-2 w-full justify-start text-white/80 hover:bg-white/10 hover:text-white"
-       onClick={handleLogout}
-     >
-       <div className="p-4 border-t">
-         <button
-           onClick={handleLogout}
-           type="button"
-           disabled={isLoggingOut}
-           className="flex w-full items-center p-2 text-base font-normal text-red-500 rounded-lg hover:bg-red-50 disabled:opacity-50"
-         >
-           <LogOut className="w-5 h-5" />
-           <span className="ml-3">{isLoggingOut ? "Saindo..." : "Sair"}</span>
-         </button>
-       </div>
-     </Button>
-   </aside>
+                {/* Submenu de Corretores */}
+                {corretoresExpanded && (
+                  <ul className="pl-6 mt-1 space-y-1">
+                    <li>
+                      <Link
+                        href="/admin/corretores"
+                        className={cn(
+                          "flex items-center p-2 text-sm font-normal rounded-lg transition-all hover:bg-transparent", // Adicionado hover:bg-transparent e transition-all
+                          isActive("/admin/corretores")
+                            ? "bg-[#13786a] font-medium"
+                            : "text-white/80 hover:bg-white/10",
+                        )}
+                        onClick={closeSidebar}
+                      >
+                        <span>Corretores</span>
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href="/admin/propostas-corretores"
+                        className={cn(
+                          "flex items-center p-2 text-sm font-normal rounded-lg transition-all hover:bg-transparent", // Adicionado hover:bg-transparent e transition-all
+                          isActive("/admin/propostas-corretores")
+                            ? "bg-[#13786a] font-medium"
+                            : "text-white/80 hover:bg-white/10",
+                        )}
+                        onClick={closeSidebar}
+                      >
+                        <span>Propostas</span>
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href="/admin/produtos-corretores"
+                        className={cn(
+                          "flex items-center p-2 text-sm font-normal rounded-lg transition-all hover:bg-transparent", // Adicionado hover:bg-transparent e transition-all
+                          isActive("/admin/produtos-corretores")
+                            ? "bg-[#13786a] font-medium"
+                            : "text-white/80 hover:bg-white/10",
+                        )}
+                        onClick={closeSidebar}
+                      >
+                        <span>Produtos</span>
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href="/admin/comissoes"
+                        className={cn(
+                          "flex items-center p-2 text-sm font-normal rounded-lg transition-all hover:bg-transparent", // Adicionado hover:bg-transparent e transition-all
+                          isActive("/admin/comissoes") ? "bg-[#13786a] font-medium" : "text-white/80 hover:bg-white/10",
+                        )}
+                        onClick={closeSidebar}
+                      >
+                        <span>Comissões</span>
+                      </Link>
+                    </li>
+                  </ul>
+                )}
+              </li>
+            </ul>
+          </nav>
+        </div>
+        <div className="mt-auto p-4">
+          <div className="flex flex-col items-center gap-2 rounded-lg px-3 py-2 border-t border-white/10 pt-4">
+            <Avatar className="h-16 w-16 mb-2">
+              <AvatarImage src={avatarUrl || ""} alt={corretor?.email || "Avatar do usuário"} />
+              <AvatarFallback className="bg-white/20 text-white">{getInitials(corretor?.email)}</AvatarFallback>
+            </Avatar>
+            <div className="text-sm font-medium text-center">{corretor?.email}</div>
+          </div>
+          <Button variant="ghost" className="w-full text-white hover:bg-[#13786a] justify-start" onClick={handleLogout}>
+            <div className="p-4 border-t">
+              <button
+                onClick={handleLogout}
+                type="button"
+                disabled={isLoggingOut}
+                className="flex w-full items-center p-2 text-base font-normal text-red-500 rounded-lg hover:bg-red-50 disabled:opacity-50"
+              >
+                <LogOut className="w-5 h-5" />
+                <span className="ml-3">{isLoggingOut ? "Saindo..." : "Sair"}</span>
+              </button>
+            </div>
+          </Button>
+        </div>
+      </aside>
 
-   {/* Content - adjusted to give space to the sidebar */}
-   <div className="md:ml-64 lg:ml-72">
-     {/* Este div é apenas para empurrar o conteúdo para a direita em telas maiores */}
-   </div>
- </>
- );
+      {/* Content - adjusted to give space to the sidebar */}
+      <div className="md:ml-64 lg:ml-72">
+        {/* Este div é apenas para empurrar o conteúdo para a direita em telas maiores */}
+      </div>
+    </>
+  )
 }
 
