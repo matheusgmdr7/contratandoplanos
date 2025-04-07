@@ -181,3 +181,4 @@ export function logout(): void {
     localStorage.removeItem("corretorLogado")
   }
 }
+
