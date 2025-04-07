@@ -290,8 +290,9 @@ export default function AdminSidebar() {
         </Button>
       </aside>
 
-      {/* Conteúdo principal - ajustado para dar espaço à sidebar */}
+      {/* Content - adjusted to give space to the sidebar */}
       <div className="md:ml-64 lg:ml-72">
         {/* Este div é apenas para empurrar o conteúdo para a direita em telas maiores */}
       </div>
+    </>
 
