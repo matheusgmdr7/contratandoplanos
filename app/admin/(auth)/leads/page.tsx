@@ -22,7 +22,7 @@ export default function LeadsPage() {
   const [filtroOperadora, setFiltroOperadora] = useState("Todos")
   const [leadSelecionado, setLeadSelecionado] = useState<Lead | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [carregando, setCarregando] = useState(true)
+  const [carregando, setLoading] = useState(true)
   const [erro, setErro] = useState<string | null>(null)
 
   useEffect(() => {
@@ -37,7 +37,7 @@ export default function LeadsPage() {
       console.error("Erro ao carregar leads:", error)
       setErro("Falha ao carregar os leads. Por favor, tente novamente.")
     } finally {
-      setCarregando(false)
+      setLoading(false)
     }
   }
 
@@ -184,7 +184,7 @@ export default function LeadsPage() {
                 <SelectContent>
                   <SelectItem value="Todos">Todos os estados</SelectItem>
                   {estados.map((estado) => (
-                    <SelectItem key={estado} value={estado}>
+                    <SelectItem key={estado} value={estado || "N/A"}>
                       {estado}
                     </SelectItem>
                   ))}
@@ -198,7 +198,7 @@ export default function LeadsPage() {
                 <SelectContent>
                   <SelectItem value="Todos">Todas as faixas</SelectItem>
                   {faixasEtarias.map((faixa) => (
-                    <SelectItem key={faixa} value={faixa}>
+                    <SelectItem key={faixa} value={faixa || "N/A"}>
                       {faixa}
                     </SelectItem>
                   ))}
@@ -210,9 +210,9 @@ export default function LeadsPage() {
                   <SelectValue placeholder="Operadora" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Todos">Todas as operadoras</SelectItem>
+                  <SelectItem value="Todos">Todos as operadoras</SelectItem>
                   {operadoras.map((operadora) => (
-                    <SelectItem key={operadora} value={operadora}>
+                    <SelectItem key={operadora} value={operadora || "N/A"}>
                       {operadora}
                     </SelectItem>
                   ))}
@@ -274,7 +274,7 @@ export default function LeadsPage() {
                       <TableCell>
                         <Select value={lead.status} onValueChange={(value) => handleStatusChange(lead.id, value)}>
                           <SelectTrigger className="w-[140px]">
-                            <SelectValue />
+                            <SelectValue placeholder={lead.status} />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="Novo">Novo</SelectItem>
@@ -401,4 +401,3 @@ export default function LeadsPage() {
     </div>
   )
 }
-
