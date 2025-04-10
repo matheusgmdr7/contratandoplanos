@@ -10,6 +10,7 @@ import Header from "@/components/header"
 import Footer from "@/components/footer"
 import { Send, User, Bot, ArrowRight } from "lucide-react"
 import Link from "next/link"
+import Script from "next/script" // Import Script component
 
 interface Mensagem {
   texto: string
@@ -187,6 +188,31 @@ export default function AssistentePage() {
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
+
+      {/* Meta Pixel Code - Loading asynchronously */}
+      <Script id="fb-pixel" strategy="afterInteractive">
+        {`
+         !function(f,b,e,v,n,t,s)
+         {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+           n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+         if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+         n.queue=[];t=b.createElement(e);t.async=!0;
+         t.src=v;s=b.getElementsByTagName(e)[0];
+         s.parentNode.insertBefore(t,s)}(window, document,'script',
+         'https://connect.facebook.net/en_US/fbevents.js');
+         fbq('init', '987817753011551');
+         fbq('track', 'PageView');
+       `}
+      </Script>
+      <noscript>
+        <img
+          height="1"
+          width="1"
+          style={{ display: "none" }}
+          src="https://www.facebook.com/tr?id=987817753011551&ev=PageView&noscript=1"
+        />
+      </noscript>
+      {/* End Meta Pixel Code */}
 
       <main className="flex-grow py-8 md:py-10 bg-gray-50">
         <div className="container px-4 md:px-6">
@@ -366,4 +392,3 @@ export default function AssistentePage() {
     </div>
   )
 }
-
